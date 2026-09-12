@@ -1,0 +1,63 @@
+.transacciones-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.transacciones-header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.filtros-card {
+  margin-bottom: 16px;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.filtros mat-form-field {
+  min-width: 150px;
+}
+
+.tabla-transacciones {
+  width: 100%;
+}
+
+.chip {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ingreso {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.gasto {
+  background: #fce4ec;
+  color: #c62828;
+}
+
+.monto-ingreso {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.monto-gasto {
+  color: #c62828;
+  font-weight: bold;
+}
+
+.empty {
+  text-align: center;
+  padding: 32px;
+  color: #999;
+}

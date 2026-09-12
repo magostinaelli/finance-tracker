@@ -1,0 +1,111 @@
+<div class="header">
+  <h1>Nueva Transacción</h1>
+</div>
+
+<mat-card class="form-card">
+  <mat-card-content>
+
+    <mat-form-field appearance="outline" class="field-full">
+      <mat-label>Tipo de transacción</mat-label>
+      <mat-select [(ngModel)]="tipo">
+        @for (t of tipos; track t.valor) {
+          <mat-option [value]="t.valor">{{ t.nombre }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    @if (tipo) {
+      <div class="form-grid">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha</mat-label>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="fecha">
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ tipo === 'COMPRA' ? 'Monto total' : 'Monto' }}</mat-label>
+          <input matInput type="number" [(ngModel)]="monto" min="0">
+          <span matTextPrefix>$&nbsp;</span>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field-full">
+          <mat-label>Descripción</mat-label>
+          <input matInput [(ngModel)]="descripcion">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Categoría</mat-label>
+          <mat-select [(ngModel)]="categoriaId">
+            @for (c of categoriasFiltradas; track c.id) {
+              <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Cuenta</mat-label>
+          <mat-select [(ngModel)]="cuentaId" (ngModelChange)="onCuentaChange()">
+            @for (c of cuentas; track c.id) {
+              <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (tipo !== 'INGRESO') {
+          <mat-form-field appearance="outline">
+            <mat-label>Medio de pago</mat-label>
+            <mat-select [(ngModel)]="medioPagoId">
+              @for (m of mediosPago; track m.id) {
+                <mat-option [value]="m.id">{{ m.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        @if (tipo === 'COMPRA') {
+          <mat-form-field appearance="outline">
+            <mat-label>Cantidad de cuotas</mat-label>
+            <input matInput type="number" [(ngModel)]="cantidadCuotas" min="1">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select [(ngModel)]="estado">
+              @for (e of estadosCompra; track e.valor) {
+                <mat-option [value]="e.valor">{{ e.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        @if (tipo === 'PAGO_SERVICIO') {
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo de servicio</mat-label>
+            <mat-select [(ngModel)]="tipoServicio">
+              @for (t of tiposServicio; track t.valor) {
+                <mat-option [value]="t.valor">{{ t.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Número de referencia (opcional)</mat-label>
+            <input matInput [(ngModel)]="numeroReferencia">
+          </mat-form-field>
+        }
+
+      </div>
+
+      <div class="acciones">
+        <button mat-button (click)="cancelar()">Cancelar</button>
+        <button mat-raised-button color="primary" (click)="guardar()" [disabled]="cargando">
+          <mat-icon>save</mat-icon>
+          {{ cargando ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    }
+
+  </mat-card-content>
+</mat-card>

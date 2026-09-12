@@ -1,0 +1,109 @@
+<h1>Catálogos</h1>
+
+<mat-tab-group>
+
+  <!-- TAB CATEGORÍAS -->
+  <mat-tab label="Categorías">
+    <div class="tab-content">
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>Nueva categoría</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <input matInput [(ngModel)]="nuevaCategoria.nombre">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo</mat-label>
+              <mat-select [(ngModel)]="nuevaCategoria.tipo">
+                @for (t of tiposCategoria; track t.valor) {
+                  <mat-option [value]="t.valor">{{ t.nombre }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" (click)="guardarCategoria()">
+              <mat-icon>add</mat-icon>
+              Agregar
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-content>
+          <table mat-table [dataSource]="categorias" class="tabla">
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef>Nombre</th>
+              <td mat-cell *matCellDef="let c">{{ c.nombre }}</td>
+            </ng-container>
+            <ng-container matColumnDef="tipo">
+              <th mat-header-cell *matHeaderCellDef>Tipo</th>
+              <td mat-cell *matCellDef="let c">{{ c.tipo }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columnasCategoria"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnasCategoria;"></tr>
+          </table>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-tab>
+
+  <!-- TAB MEDIOS DE PAGO -->
+  <mat-tab label="Medios de pago">
+    <div class="tab-content">
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>Nuevo medio de pago</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <input matInput [(ngModel)]="nuevoMedioPago.nombre">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo</mat-label>
+              <mat-select [(ngModel)]="nuevoMedioPago.tipo">
+                @for (t of tiposMedioPago; track t.valor) {
+                  <mat-option [value]="t.valor">{{ t.nombre }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" (click)="guardarMedioPago()">
+              <mat-icon>add</mat-icon>
+              Agregar
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-content>
+          <table mat-table [dataSource]="mediosPago" class="tabla">
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef>Nombre</th>
+              <td mat-cell *matCellDef="let m">{{ m.nombre }}</td>
+            </ng-container>
+            <ng-container matColumnDef="tipo">
+              <th mat-header-cell *matHeaderCellDef>Tipo</th>
+              <td mat-cell *matCellDef="let m">{{ m.tipo }}</td>
+            </ng-container>
+            <ng-container matColumnDef="activo">
+              <th mat-header-cell *matHeaderCellDef>Activo</th>
+              <td mat-cell *matCellDef="let m">{{ m.activo ? 'Sí' : 'No' }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columnasMedioPago"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnasMedioPago;"></tr>
+          </table>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-tab>
+
+</mat-tab-group>

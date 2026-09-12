@@ -1,0 +1,174 @@
+<h1>Cuentas</h1>
+
+<mat-card class="form-card">
+  <mat-card-header>
+    <mat-card-title>Nueva cuenta</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="form-grid">
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput [(ngModel)]="nuevaCuenta.nombre">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select [(ngModel)]="nuevaCuenta.tipo">
+          @for (t of tiposCuenta; track t.valor) {
+            <mat-option [value]="t.valor">{{ t.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+    @if (esTarjetaCredito) {
+      <mat-divider></mat-divider>
+      <h3>Configuración de cierre y vencimiento <span class="opcional">(opcional)</span></h3>
+
+      <div class="form-grid">
+
+        <!-- CIERRE -->
+        <mat-form-field appearance="outline">
+          <mat-label>Modo de cierre</mat-label>
+          <mat-select [(ngModel)]="nuevaCuenta.modoCierre">
+            <mat-option [value]="null">Sin configurar</mat-option>
+            @for (m of modosCalculo; track m.valor) {
+              @if (m.valor !== 'DIAS_DESPUES_CIERRE') {
+                <mat-option [value]="m.valor">{{ m.nombre }}</mat-option>
+              }
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (modoCierreEsPosicion) {
+          <mat-form-field appearance="outline">
+            <mat-label>Posición</mat-label>
+            <mat-select [(ngModel)]="nuevaCuenta.posicionCierre">
+              @for (p of posicionesDia; track p.valor) {
+                <mat-option [value]="p.valor">{{ p.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Día de la semana</mat-label>
+            <mat-select [(ngModel)]="nuevaCuenta.diaSemanaCierre">
+              @for (d of diasSemana; track d.valor) {
+                <mat-option [value]="d.valor">{{ d.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        @if (modoCierreEsFijo) {
+          <mat-form-field appearance="outline">
+            <mat-label>Día fijo (1-31)</mat-label>
+            <input matInput type="number" [(ngModel)]="nuevaCuenta.diaFijoCierre" min="1" max="31">
+          </mat-form-field>
+        }
+
+        <!-- VENCIMIENTO -->
+        <mat-form-field appearance="outline">
+          <mat-label>Modo de vencimiento</mat-label>
+          <mat-select [(ngModel)]="nuevaCuenta.modoVencimiento">
+            <mat-option [value]="null">Sin configurar</mat-option>
+            @for (m of modosCalculo; track m.valor) {
+              <mat-option [value]="m.valor">{{ m.nombre }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (modoVencimientoEsPosicion) {
+          <mat-form-field appearance="outline">
+            <mat-label>Posición</mat-label>
+            <mat-select [(ngModel)]="nuevaCuenta.posicionVencimiento">
+              @for (p of posicionesDia; track p.valor) {
+                <mat-option [value]="p.valor">{{ p.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Día de la semana</mat-label>
+            <mat-select [(ngModel)]="nuevaCuenta.diaSemanaVencimiento">
+              @for (d of diasSemana; track d.valor) {
+                <mat-option [value]="d.valor">{{ d.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        @if (modoVencimientoEsFijo) {
+          <mat-form-field appearance="outline">
+            <mat-label>Día fijo (1-31)</mat-label>
+            <input matInput type="number" [(ngModel)]="nuevaCuenta.diaFijoVencimiento" min="1" max="31">
+          </mat-form-field>
+        }
+
+        @if (modoVencimientoEsDias) {
+          <mat-form-field appearance="outline">
+            <mat-label>Días después del cierre</mat-label>
+            <input matInput type="number" [(ngModel)]="nuevaCuenta.diasDespuesCierre" min="1">
+          </mat-form-field>
+        }
+
+      </div>
+    }
+
+    <div class="acciones">
+      <button mat-raised-button color="primary" (click)="guardar()" [disabled]="cargando">
+        <mat-icon>save</mat-icon>
+        {{ cargando ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-content>
+    <table mat-table [dataSource]="cuentas" class="tabla">
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let c">{{ c.nombre }}</td>
+      </ng-container>
+      <ng-container matColumnDef="tipo">
+        <th mat-header-cell *matHeaderCellDef>Tipo</th>
+        <td mat-cell *matCellDef="let c">{{ c.tipo }}</td>
+      </ng-container>
+      <ng-container matColumnDef="activo">
+        <th mat-header-cell *matHeaderCellDef>Activo</th>
+        <td mat-cell *matCellDef="let c">{{ c.activo ? 'Sí' : 'No' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let c">
+          @if (c.activo) {
+            <button mat-icon-button color="warn"
+              matTooltip="Desactivar cuenta"
+              (click)="desactivar(c)">
+              <mat-icon>block</mat-icon>
+            </button>
+          } @else {
+            <button mat-icon-button color="primary"
+              matTooltip="Activar cuenta"
+              (click)="activar(c)">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+          }
+          <button mat-icon-button color="warn"
+            matTooltip="Eliminar cuenta"
+            (click)="eliminar(c)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

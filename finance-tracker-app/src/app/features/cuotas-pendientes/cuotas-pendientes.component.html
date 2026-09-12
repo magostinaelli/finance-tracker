@@ -1,0 +1,95 @@
+<div class="header">
+  <h1>Cuotas pendientes</h1>
+  <button mat-raised-button color="primary" (click)="limpiarFiltros()">
+    <mat-icon>filter_alt_off</mat-icon>
+    Limpiar filtros
+  </button>
+</div>
+
+<mat-card class="resumen-card">
+  <mat-card-content>
+    <div class="resumen">
+      <mat-icon>payments</mat-icon>
+      <div>
+        <p class="resumen-label">Total comprometido a futuro</p>
+        <p class="resumen-monto">{{ totalFuturo | currency:'ARS':'symbol':'1.0-0' }}</p>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="filtros-card">
+  <mat-card-content>
+    <div class="filtros">
+      <mat-form-field appearance="outline">
+        <mat-label>Cuenta</mat-label>
+        <mat-select [(ngModel)]="cuentaId" (ngModelChange)="cargarCuotas()">
+          <mat-option [value]="null">Todas</mat-option>
+          @for (c of cuentas; track c.id) {
+            <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Mes</mat-label>
+        <mat-select [(ngModel)]="mes" (ngModelChange)="cargarCuotas()">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (m of meses; track m.valor) {
+            <mat-option [value]="m.valor">{{ m.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Año</mat-label>
+        <mat-select [(ngModel)]="anio" (ngModelChange)="cargarCuotas()">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (a of anios; track a) {
+            <mat-option [value]="a">{{ a }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-content>
+    <table mat-table [dataSource]="cuotas" class="tabla">
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef>Vencimiento</th>
+        <td mat-cell *matCellDef="let c">{{ c.fecha | date:'dd/MM/yyyy' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="descripcion">
+        <th mat-header-cell *matHeaderCellDef>Descripción</th>
+        <td mat-cell *matCellDef="let c">{{ c.descripcion }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="categoria">
+        <th mat-header-cell *matHeaderCellDef>Categoría</th>
+        <td mat-cell *matCellDef="let c">{{ getCategoria(c) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="cuenta">
+        <th mat-header-cell *matHeaderCellDef>Cuenta</th>
+        <td mat-cell *matCellDef="let c">{{ getCuenta(c) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="monto">
+        <th mat-header-cell *matHeaderCellDef>Monto</th>
+        <td mat-cell *matCellDef="let c" class="monto">
+          {{ c.monto | currency:'ARS':'symbol':'1.0-0' }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+    </table>
+
+    @if (cuotas.length === 0) {
+      <div class="empty">No hay cuotas futuras pendientes</div>
+    }
+  </mat-card-content>
+</mat-card>

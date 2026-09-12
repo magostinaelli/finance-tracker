@@ -1,0 +1,156 @@
+<div class="transacciones-header">
+  <h1>Transacciones</h1>
+  <button mat-raised-button color="primary" (click)="limpiarFiltros()">
+    <mat-icon>filter_alt_off</mat-icon>
+    Limpiar filtros
+  </button>
+</div>
+
+<mat-card class="filtros-card">
+  <mat-card-content>
+    <div class="filtros">
+      <mat-form-field appearance="outline">
+        <mat-label>Mes</mat-label>
+        <mat-select [(ngModel)]="mes" (ngModelChange)="cargarTransacciones()">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (m of meses; track m.valor) {
+            <mat-option [value]="m.valor">{{ m.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Año</mat-label>
+        <mat-select [(ngModel)]="anio" (ngModelChange)="cargarTransacciones()">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (a of anios; track a) {
+            <mat-option [value]="a">{{ a }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select [(ngModel)]="tipo" (ngModelChange)="cargarTransacciones()">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (t of tipos; track t.valor) {
+            <mat-option [value]="t.valor">{{ t.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Cuenta</mat-label>
+        <mat-select [(ngModel)]="cuentaId" (ngModelChange)="cargarTransacciones()">
+          <mat-option [value]="null">Todas</mat-option>
+          @for (c of cuentas; track c.id) {
+            <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Medio de pago</mat-label>
+        <mat-select [(ngModel)]="medioPagoId" (ngModelChange)="cargarTransacciones()">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (m of mediosPago; track m.id) {
+            <mat-option [value]="m.id">{{ m.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categoría</mat-label>
+        <mat-select [(ngModel)]="categoriaId" (ngModelChange)="cargarTransacciones()">
+          <mat-option [value]="null">Todas</mat-option>
+          @for (c of categorias; track c.id) {
+            <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-slide-toggle
+        [(ngModel)]="mostrarCanceladas"
+        (ngModelChange)="cargarTransacciones()">
+        Mostrar canceladas
+      </mat-slide-toggle>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="tabla-card">
+  <mat-card-content>
+    <table mat-table [dataSource]="transacciones" class="tabla-transacciones">
+
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef>Fecha</th>
+        <td mat-cell *matCellDef="let t">{{ t.fecha | date:'dd/MM/yyyy' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipo">
+        <th mat-header-cell *matHeaderCellDef>Tipo</th>
+        <td mat-cell *matCellDef="let t">
+          <span class="chip" [class.ingreso]="esIngreso(t)" [class.gasto]="!esIngreso(t)">
+            {{ getTipo(t) }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="descripcion">
+        <th mat-header-cell *matHeaderCellDef>Descripción</th>
+        <td mat-cell *matCellDef="let t">{{ getDescripcion(t) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="categoria">
+        <th mat-header-cell *matHeaderCellDef>Categoría</th>
+        <td mat-cell *matCellDef="let t">{{ getCategoria(t) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="cuenta">
+        <th mat-header-cell *matHeaderCellDef>Cuenta</th>
+        <td mat-cell *matCellDef="let t">{{ getCuenta(t) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="medioPago">
+        <th mat-header-cell *matHeaderCellDef>Medio de pago</th>
+        <td mat-cell *matCellDef="let t">
+          @if (!esIngreso(t)) {
+            {{ getMedioPago(t) }}
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="monto">
+        <th mat-header-cell *matHeaderCellDef>Monto</th>
+        <td mat-cell *matCellDef="let t" [class.monto-ingreso]="esIngreso(t)" [class.monto-gasto]="!esIngreso(t)">
+          {{ getMonto(t) | currency:'ARS':'symbol':'1.0-0' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let t">
+          @if (t.gasto?.compra && !esCancelada(t)) {
+            <button mat-icon-button color="warn"
+              matTooltip="Cancelar compra"
+              (click)="cancelar(t)">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          }
+          <button mat-icon-button color="warn"
+            matTooltip="Eliminar"
+            (click)="eliminar(t)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+    </table>
+
+    @if (transacciones.length === 0) {
+      <div class="empty">No hay transacciones para los filtros seleccionados</div>
+    }
+  </mat-card-content>
+</mat-card>

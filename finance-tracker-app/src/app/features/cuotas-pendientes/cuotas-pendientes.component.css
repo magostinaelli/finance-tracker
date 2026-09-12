@@ -1,0 +1,69 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.resumen-card {
+  margin-bottom: 16px;
+  border-left: 4px solid #ff9800;
+}
+
+.resumen {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px;
+}
+
+.resumen mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: #ff9800;
+}
+
+.resumen-label {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.resumen-monto {
+  margin: 0;
+  font-size: 28px;
+  font-weight: bold;
+  color: #ff9800;
+}
+
+.filtros-card {
+  margin-bottom: 16px;
+}
+
+.filtros {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tabla {
+  width: 100%;
+}
+
+.monto {
+  font-weight: bold;
+  color: #f44336;
+}
+
+.empty {
+  text-align: center;
+  padding: 32px;
+  color: #999;
+}

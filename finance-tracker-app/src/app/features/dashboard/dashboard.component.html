@@ -1,0 +1,114 @@
+<div class="dashboard-header">
+  <h1>Dashboard</h1>
+  <div class="filtros">
+    <mat-form-field appearance="outline">
+      <mat-label>Mes</mat-label>
+      <mat-select [(ngModel)]="mes" (ngModelChange)="cargarResumen()">
+        @for (m of meses; track m.valor) {
+          <mat-option [value]="m.valor">{{ m.nombre }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Año</mat-label>
+      <mat-select [(ngModel)]="anio" (ngModelChange)="cargarResumen()">
+        @for (a of anios; track a) {
+          <mat-option [value]="a">{{ a }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+</div>
+
+@if (resumen) {
+  <div class="cards-resumen">
+    <mat-card class="card-ingreso">
+      <mat-card-content>
+        <mat-icon>trending_up</mat-icon>
+        <div>
+          <p class="card-label">Ingresos</p>
+          <p class="card-monto">{{ resumen.ingresos | currency:'ARS':'symbol':'1.0-0' }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="card-gasto">
+      <mat-card-content>
+        <mat-icon>trending_down</mat-icon>
+        <div>
+          <p class="card-label">Gastos</p>
+          <p class="card-monto">{{ resumen.gastos | currency:'ARS':'symbol':'1.0-0' }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="card-balance" [class.negativo]="resumen.balance < 0">
+      <mat-card-content>
+        <mat-icon>account_balance</mat-icon>
+        <div>
+          <p class="card-label">Balance</p>
+          <p class="card-monto">{{ resumen.balance | currency:'ARS':'symbol':'1.0-0' }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="categorias">
+    <mat-card class="tabla-categorias">
+      <mat-card-header>
+        <mat-card-title>Ingresos por categoría</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @for (c of resumen.categoriasIngresos; track c.categoriaId) {
+          <div class="categoria-row">
+            <span>{{ c.nombre }}</span>
+            <span>{{ c.total | currency:'ARS':'symbol':'1.0-0' }}</span>
+          </div>
+        } @empty {
+          <div class="empty">Sin ingresos este mes</div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    
+    <mat-card class="tabla-categorias">
+      <mat-card-header>
+        <mat-card-title>Gastos por categoría</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @for (c of resumen.categoriasGastos; track c.categoriaId) {
+          <div class="categoria-row">
+            <span>{{ c.nombre }}</span>
+            <span>{{ c.total | currency:'ARS':'symbol':'1.0-0' }}</span>
+          </div>
+        } @empty {
+          <div class="empty">Sin gastos este mes</div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+@if (cuotasProximas.length > 0) {
+  <mat-card class="cuotas-card">
+    <mat-card-header>
+      <mat-card-title>Próximos vencimientos</mat-card-title>
+      <mat-card-subtitle>
+        Total comprometido: {{ totalProximo | currency:'ARS':'symbol':'1.0-0' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @for (c of cuotasProximas; track c.id) {
+        <div class="cuota-row">
+          <span class="cuota-fecha">{{ c.fecha | date:'dd/MM/yyyy' }}</span>
+          <span class="cuota-desc">{{ c.descripcion }}</span>
+          <span class="cuota-monto">{{ c.monto | currency:'ARS':'symbol':'1.0-0' }}</span>
+        </div>
+      }
+      <a mat-button color="primary" routerLink="/cuotas-pendientes">
+        Ver todas →
+      </a>
+    </mat-card-content>
+  </mat-card>
+}
+
+}
