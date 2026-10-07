@@ -103,7 +103,15 @@
 
       <ng-container matColumnDef="categoria">
         <th mat-header-cell *matHeaderCellDef>Categoría</th>
-        <td mat-cell *matCellDef="let t">{{ getCategoria(t) }}</td>
+        <td mat-cell *matCellDef="let t">
+          <mat-select
+            [value]="getCategoriaId(t)"
+            (selectionChange)="cambiarCategoria(t, $event.value)">
+            @for (c of getCategoriasDisponibles(t); track c.id) {
+              <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+            }
+          </mat-select>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="cuenta">

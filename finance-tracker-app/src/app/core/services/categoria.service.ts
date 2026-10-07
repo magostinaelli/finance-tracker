@@ -18,4 +18,12 @@ export class CategoriaService {
   create(data: any): Observable<any> {
     return this.http.post(this.apiUrl, data);
   }
+
+  update(id: number, data: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}`, data);
+  }
+
+  remove(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }  
 }

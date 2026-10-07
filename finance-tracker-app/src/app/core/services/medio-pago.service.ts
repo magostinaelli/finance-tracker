@@ -11,10 +11,19 @@ export class MedioPagoService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(tipoCuenta?: string): Observable<any[]> {
+  getAll(tipoCuenta?: string, incluirInactivos = false): Observable<any[]> {
     let params = new HttpParams();
     if (tipoCuenta) params = params.set('tipoCuenta', tipoCuenta);
+    if (incluirInactivos) params = params.set('incluirInactivos', true);
     return this.http.get<any[]>(this.apiUrl, { params });
+  }
+
+  update(id: number, data: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}`, data);
+  }
+
+  remove(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
   create(data: any): Observable<any> {

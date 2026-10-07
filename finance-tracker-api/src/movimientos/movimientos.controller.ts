@@ -7,13 +7,6 @@ import { FiltrosCuotasDto } from './dto/filtros-cuotas.dto';
 export class MovimientosController {
   constructor(private readonly movimientosService: MovimientosService) {}
 
-  // NOTA: se sacó POST (create) -> los Movimientos ahora se crean
-  // siempre desde dentro de ComprasService / PagosService / IngresosService.
-
-  // NOTA: se sacó GET /resumen y el filtro de BuscarMovimientosDto
-  // hasta que rearmemos esa lógica para la jerarquía nueva
-  // (movimiento -> gasto/ingreso -> categoria).
-
   @Get()
   findAll() {
     return this.movimientosService.findAll();

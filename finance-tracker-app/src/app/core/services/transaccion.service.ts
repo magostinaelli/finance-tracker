@@ -19,6 +19,7 @@ export class TransaccionService {
     if (filtros?.cuentaId) params = params.set('cuentaId', filtros.cuentaId);
     if (filtros?.categoriaId) params = params.set('categoriaId', filtros.categoriaId);
     if (filtros?.medioPagoId) params = params.set('medioPagoId', filtros.medioPagoId);
+    if (filtros?.mostrarCanceladas !== undefined) params = params.set('mostrarCanceladas', filtros.mostrarCanceladas);
     return this.http.get<any[]>(`${this.apiUrl}/transacciones`, { params });
   }
 
@@ -48,5 +49,17 @@ eliminarPago(id: number): Observable<any> {
 
 eliminarIngreso(id: number): Observable<any> {
   return this.http.delete(`${this.apiUrl}/ingresos/${id}`);
+}
+
+actualizarCategoriaCompra(id: number, categoriaId: number): Observable<any> {
+  return this.http.patch(`${this.apiUrl}/compras/${id}`, { categoriaId });
+}
+
+actualizarCategoriaPago(id: number, categoriaId: number): Observable<any> {
+  return this.http.patch(`${this.apiUrl}/pagos/${id}`, { categoriaId });
+}
+
+actualizarCategoriaIngreso(id: number, categoriaId: number): Observable<any> {
+  return this.http.patch(`${this.apiUrl}/ingresos/${id}`, { categoriaId });
 }
 }

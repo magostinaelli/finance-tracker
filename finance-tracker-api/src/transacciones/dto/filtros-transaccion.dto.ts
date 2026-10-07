@@ -1,5 +1,5 @@
 import { IsOptional, IsInt, IsDateString, IsIn, IsBoolean } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class FiltrosTransaccionDto {
   // Fecha: mes/anio O rango, no ambos. Si vienen los dos, se usa mes/anio.
@@ -43,6 +43,8 @@ export class FiltrosTransaccionDto {
 
   @IsOptional()
   @IsBoolean()
-  @Type(() => Boolean)
+  @Transform(({ value }) =>
+    value === undefined ? undefined : value === 'true' || value === true,
+  )
   mostrarCanceladas?: boolean;
 }

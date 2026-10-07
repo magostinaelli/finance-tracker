@@ -75,9 +75,18 @@ export class TransaccionesComponent implements OnInit {
   }
 
   cargarCatalogos(): void {
-    this.categoriaService.getAll().subscribe(data => this.categorias = data);
-    this.cuentaService.getAll().subscribe(data => this.cuentas = data);
-    this.medioPagoService.getAll().subscribe(data => this.mediosPago = data);
+    this.categoriaService.getAll().subscribe(data => {
+      this.categorias = data;
+      this.cdr.markForCheck();
+    });
+    this.cuentaService.getAll().subscribe(data => {
+      this.cuentas = data;
+      this.cdr.markForCheck();
+    });
+    this.medioPagoService.getAll().subscribe(data => {
+      this.mediosPago = data;
+      this.cdr.markForCheck();
+    });
   }
 
   cargarTransacciones(): void {
@@ -88,12 +97,12 @@ export class TransaccionesComponent implements OnInit {
     if (this.cuentaId) filtros.cuentaId = this.cuentaId;
     if (this.categoriaId) filtros.categoriaId = this.categoriaId;
     if (this.medioPagoId) filtros.medioPagoId = this.medioPagoId;
-    if (this.mostrarCanceladas) filtros.mostrarCanceladas = this.mostrarCanceladas;
+    filtros.mostrarCanceladas = this.mostrarCanceladas;
 
     this.transaccionService.getAll(filtros).subscribe({
       next: (data) => {
         this.transacciones = data;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: (err) => console.error('Error:', err),
     });
@@ -178,6 +187,35 @@ export class TransaccionesComponent implements OnInit {
   esCancelada(t: Transaccion): boolean {
     return t.gasto?.compra?.estado === 'CANCELADA';
   }
+getCategoriaId(t: Transaccion): number | null {
+  return t.gasto?.categoriaId ?? t.ingreso?.categoriaId ?? null;
+}
 
+getCategoriasDisponibles(t: Transaccion): Categoria[] {
+  const tipo = t.ingreso ? 'INGRESO' : 'GASTO';
+  return this.categorias.filter(c => c.tipo === tipo);
+}
+
+cambiarCategoria(t: Transaccion, categoriaId: number): void {
+  let observable;
+  if (t.gasto?.compra) {
+    observable = this.transaccionService.actualizarCategoriaCompra(t.gasto.compra.id, categoriaId);
+  } else if (t.gasto?.pago) {
+    observable = this.transaccionService.actualizarCategoriaPago(t.gasto.pago.id, categoriaId);
+  } else if (t.ingreso) {
+    observable = this.transaccionService.actualizarCategoriaIngreso(t.ingreso.id, categoriaId);
+  } else return;
+
+  observable.subscribe({
+    next: () => {
+      this.snackBar.open('Categoría actualizada', 'OK', { duration: 3000 });
+      this.cargarTransacciones();
+    },
+    error: (err) => {
+      this.snackBar.open(err.error?.message ?? 'Error al actualizar', 'OK', { duration: 4000 });
+      this.cargarTransacciones();
+    },
+  });
+}
 
 }

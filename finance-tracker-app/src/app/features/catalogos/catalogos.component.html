@@ -38,11 +38,49 @@
           <table mat-table [dataSource]="categorias" class="tabla">
             <ng-container matColumnDef="nombre">
               <th mat-header-cell *matHeaderCellDef>Nombre</th>
-              <td mat-cell *matCellDef="let c">{{ c.nombre }}</td>
+              <td mat-cell *matCellDef="let c">
+                @if (editandoCategoriaId === c.id) {
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <input matInput [(ngModel)]="nombreCategoriaEditado"
+                      (keyup.enter)="guardarEdicionCategoria(c)"
+                      (keyup.escape)="cancelarEdicionCategoria()">
+                  </mat-form-field>
+                } @else {
+                  {{ c.nombre }}
+                }
+              </td>
             </ng-container>
             <ng-container matColumnDef="tipo">
               <th mat-header-cell *matHeaderCellDef>Tipo</th>
               <td mat-cell *matCellDef="let c">{{ c.tipo }}</td>
+            </ng-container>
+            <ng-container matColumnDef="activo">
+              <th mat-header-cell *matHeaderCellDef>Activo</th>
+              <td mat-cell *matCellDef="let c">
+                <mat-slide-toggle [checked]="c.activo"
+                  (change)="toggleActivoCategoria(c, $event.checked)">
+                </mat-slide-toggle>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let c">
+                @if (editandoCategoriaId === c.id) {
+                  <button mat-icon-button aria-label="Guardar" (click)="guardarEdicionCategoria(c)">
+                    <mat-icon>check</mat-icon>
+                  </button>
+                  <button mat-icon-button aria-label="Cancelar" (click)="cancelarEdicionCategoria()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                } @else {
+                  <button mat-icon-button aria-label="Editar" (click)="editarCategoria(c)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" aria-label="Eliminar" (click)="eliminarCategoria(c)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
+              </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="columnasCategoria"></tr>
             <tr mat-row *matRowDef="let row; columns: columnasCategoria;"></tr>
@@ -88,7 +126,17 @@
           <table mat-table [dataSource]="mediosPago" class="tabla">
             <ng-container matColumnDef="nombre">
               <th mat-header-cell *matHeaderCellDef>Nombre</th>
-              <td mat-cell *matCellDef="let m">{{ m.nombre }}</td>
+              <td mat-cell *matCellDef="let m">
+                @if (editandoMedioPagoId === m.id) {
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <input matInput [(ngModel)]="nombreMedioPagoEditado"
+                      (keyup.enter)="guardarEdicionMedioPago(m)"
+                      (keyup.escape)="cancelarEdicionMedioPago()">
+                  </mat-form-field>
+                } @else {
+                  {{ m.nombre }}
+                }
+              </td>
             </ng-container>
             <ng-container matColumnDef="tipo">
               <th mat-header-cell *matHeaderCellDef>Tipo</th>
@@ -96,7 +144,31 @@
             </ng-container>
             <ng-container matColumnDef="activo">
               <th mat-header-cell *matHeaderCellDef>Activo</th>
-              <td mat-cell *matCellDef="let m">{{ m.activo ? 'Sí' : 'No' }}</td>
+              <td mat-cell *matCellDef="let m">
+                <mat-slide-toggle [checked]="m.activo"
+                  (change)="toggleActivoMedioPago(m, $event.checked)">
+                </mat-slide-toggle>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let m">
+                @if (editandoMedioPagoId === m.id) {
+                  <button mat-icon-button aria-label="Guardar" (click)="guardarEdicionMedioPago(m)">
+                    <mat-icon>check</mat-icon>
+                  </button>
+                  <button mat-icon-button aria-label="Cancelar" (click)="cancelarEdicionMedioPago()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                } @else {
+                  <button mat-icon-button aria-label="Editar" (click)="editarMedioPago(m)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" aria-label="Eliminar" (click)="eliminarMedioPago(m)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
+              </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="columnasMedioPago"></tr>
             <tr mat-row *matRowDef="let row; columns: columnasMedioPago;"></tr>

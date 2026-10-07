@@ -165,11 +165,14 @@ export class PagosService {
     }
 
     // Actualizar Pago
-    await this.pagoRepository.update(id, {
+    const pagoUpdates = {
       ...(dto.tipoServicio && { tipoServicio: dto.tipoServicio }),
       ...(dto.numeroReferencia !== undefined && { numeroReferencia: dto.numeroReferencia }),
       ...(dto.detalleOtro !== undefined && { detalleOtro: dto.detalleOtro }),
-    });
+    };
+    if (Object.keys(pagoUpdates).length > 0) {
+      await this.pagoRepository.update(id, pagoUpdates);
+    }
 
     // Actualizar el Movimiento (fecha y monto)
     const movimiento = pago.gasto.transaccion.movimientos[0];

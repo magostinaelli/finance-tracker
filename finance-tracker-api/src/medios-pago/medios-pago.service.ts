@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateMediosPagoDto } from './dto/create-medios-pago.dto';
+import { UpdateMediosPagoDto } from './dto/update-medios-pago.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, FindOptionsWhere  } from 'typeorm';
 import { MediosPago } from './entities/medios-pago.entity';
 import { TipoMedioPago } from './enums/tipo-medio-pago.enum';
 import { TipoCuenta } from '../cuentas/enums/tipo-cuenta.enum';
@@ -20,18 +22,48 @@ export class MediosPagoService {
     private readonly mediosPagoRepository: Repository<MediosPago>,
   ) {}
 
-  findAll(tipoCuenta?: TipoCuenta): Promise<MediosPago[]> {
-    if (!tipoCuenta || !COMPATIBILIDAD[tipoCuenta]) {
-      return this.mediosPagoRepository.find({ where: { activo: true } });
+  findAll(tipoCuenta?: TipoCuenta, incluirInactivos = false): Promise<MediosPago[]> {
+    const where: FindOptionsWhere<MediosPago> = incluirInactivos ? {} : { activo: true };
+    if (tipoCuenta && COMPATIBILIDAD[tipoCuenta]) {
+      where.tipo = In(COMPATIBILIDAD[tipoCuenta]);
     }
-    const tiposCompatibles = COMPATIBILIDAD[tipoCuenta];
-    return this.mediosPagoRepository.find({
-      where: { activo: true, tipo: In(tiposCompatibles) },
-    });
+    return this.mediosPagoRepository.find({ where });
   }
 
-  create(dto: { nombre: string; tipo: TipoMedioPago; activo: boolean }): Promise<MediosPago> {
-    const medioPago = this.mediosPagoRepository.create(dto);
+  create(dto: CreateMediosPagoDto): Promise<MediosPago> {
+    const medioPago = this.mediosPagoRepository.create({
+      ...dto,
+      activo: dto.activo ?? true,
+    });
     return this.mediosPagoRepository.save(medioPago);
+  }
+
+  async findOne(id: number): Promise<MediosPago> {
+    const medioPago = await this.mediosPagoRepository.findOne({ where: { id } });
+    if (!medioPago) throw new NotFoundException(`Medio de pago ${id} no encontrado`);
+    return medioPago;
+  }
+
+  async update(id: number, dto: UpdateMediosPagoDto): Promise<MediosPago> {
+    const medioPago = await this.findOne(id);
+    if (dto.nombre !== undefined) medioPago.nombre = dto.nombre;
+    if (dto.activo !== undefined) medioPago.activo = dto.activo;
+    return this.mediosPagoRepository.save(medioPago);
+  }
+
+  async remove(id: number): Promise<void> {
+    const medioPago = await this.mediosPagoRepository.findOne({
+      where: { id },
+      relations: { gastos: true },
+    });
+    if (!medioPago) throw new NotFoundException(`Medio de pago ${id} no encontrado`);
+
+    if (medioPago.gastos.length > 0) {
+      throw new ConflictException(
+        `El medio de pago está en uso en ${medioPago.gastos.length} gasto(s). Eliminá esos gastos antes de borrarlo.`,
+      );
+    }
+
+    await this.mediosPagoRepository.delete(id);
   }
 }

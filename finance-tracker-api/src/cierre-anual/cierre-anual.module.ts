@@ -4,9 +4,11 @@ import { CierreAnualService } from './cierre-anual.service';
 import { ResumenAnual } from './entities/resumen-anual.entity';
 import { Movimiento } from '../movimientos/entities/movimiento.entity';
 import { Transaccion } from '../transacciones/entities/transaccion.entity';
+import { CierreAnualController } from './cierre-anual.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ResumenAnual, Movimiento, Transaccion])],
+  controllers: [CierreAnualController],  
   providers: [CierreAnualService],
   exports: [CierreAnualService],
 })
