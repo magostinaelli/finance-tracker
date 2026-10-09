@@ -2,6 +2,7 @@ import { Controller, Get, Param, Delete, Query } from '@nestjs/common';
 import { MovimientosService } from './movimientos.service';
 import { ResumenMovimientosDto } from './dto/resumen-movimientos.dto';
 import { FiltrosCuotasDto } from './dto/filtros-cuotas.dto';
+import { ResumenAnualDto } from './dto/resumen-anual.dto';
 
 @Controller('movimientos')
 export class MovimientosController {
@@ -16,6 +17,12 @@ export class MovimientosController {
   getResumen(@Query() filtros: ResumenMovimientosDto) {
     return this.movimientosService.getResumen(filtros);
   }
+
+  @Get('resumen-anual')
+  getResumenAnual(@Query() filtros: ResumenAnualDto) {
+    return this.movimientosService.getResumenAnual(filtros);
+  }
+
   @Get('cuotas-futuras')
   getCuotasFuturas(@Query() filtros: FiltrosCuotasDto) {
     return this.movimientosService.getCuotasFuturas(filtros);

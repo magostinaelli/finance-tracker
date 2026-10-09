@@ -23,14 +23,14 @@
   margin-bottom: 24px;
 }
 
-mat-card-content {
+.cards-resumen mat-card-content {
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 16px !important;
 }
 
-mat-icon {
+.cards-resumen mat-icon {
   font-size: 40px;
   width: 40px;
   height: 40px;
@@ -59,17 +59,63 @@ mat-icon {
 .card-balance.negativo { border-left-color: #f44336; }
 .card-balance.negativo mat-icon { color: #f44336; }
 
+.grafico-card {
+  margin-bottom: 24px;
+}
+
+.grafico-barras {
+  position: relative;
+  height: 320px;
+  width: 100%;
+}
+
 .categorias {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
+.tabla-categorias mat-card-header {
+  margin-bottom: 12px;
+}
+
+.grafico-pie {
+  position: relative;
+  height: 220px;
+  margin-bottom: 16px;
+}
+
 .categoria-row {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   padding: 8px 0;
   border-bottom: 1px solid #eee;
+}
+
+.categoria-nombre {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.categoria-monto {
+  font-weight: 500;
+}
+
+.categoria-pct {
+  min-width: 40px;
+  text-align: right;
+  font-size: 12px;
+  color: #999;
 }
 
 .empty {
@@ -77,6 +123,7 @@ mat-icon {
   text-align: center;
   padding: 16px;
 }
+
 .cuotas-card {
   margin-top: 16px;
   border-left: 4px solid #ff9800;

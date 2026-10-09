@@ -13,3 +13,9 @@ export interface Resumen {
   categoriasIngresos: CategoriaResumen[];
   categoriasGastos: CategoriaResumen[];
 }
+
+export interface ResumenMensual {
+  mes: number;
+  ingresos: number;
+  gastos: number;
+}

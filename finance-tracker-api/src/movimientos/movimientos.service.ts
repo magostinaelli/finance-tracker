@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Movimiento } from './entities/movimiento.entity';
 import { ResumenMovimientosDto } from './dto/resumen-movimientos.dto';
 import { FiltrosCuotasDto } from './dto/filtros-cuotas.dto';
+import { ResumenAnualDto } from './dto/resumen-anual.dto';
 
 @Injectable()
 export class MovimientosService {
@@ -129,4 +130,45 @@ export class MovimientosService {
 
     return query.getMany();
   }
+
+  async getResumenAnual(filtros: ResumenAnualDto) {
+    const anio = filtros.anio ?? new Date().getFullYear();
+    const hoy = new Date();
+
+    const ingresosPorMes = await this.movimientoRepository
+      .createQueryBuilder('movimiento')
+      .innerJoin('movimiento.transaccion', 'transaccion')
+      .innerJoin('transaccion.ingreso', 'ingreso')
+      .select('MONTH(movimiento.fecha)', 'mes')
+      .addSelect('SUM(movimiento.monto)', 'total')
+      .where('YEAR(movimiento.fecha) = :anio', { anio })
+      .groupBy('MONTH(movimiento.fecha)')
+      .getRawMany();
+
+    const gastosPorMes = await this.movimientoRepository
+      .createQueryBuilder('movimiento')
+      .innerJoin('movimiento.transaccion', 'transaccion')
+      .innerJoin('transaccion.gasto', 'gasto')
+      .leftJoin('gasto.compra', 'compra')
+      .select('MONTH(movimiento.fecha)', 'mes')
+      .addSelect('SUM(movimiento.monto)', 'total')
+      .where('YEAR(movimiento.fecha) = :anio', { anio })
+      .andWhere(
+        '(compra.estado IS NULL OR compra.estado != :cancelada OR movimiento.fecha <= :hoy)',
+        { cancelada: 'CANCELADA', hoy },
+      )
+      .groupBy('MONTH(movimiento.fecha)')
+      .getRawMany();
+
+    return Array.from({ length: 12 }, (_, i) => {
+      const mes = i + 1;
+      const ing = ingresosPorMes.find((r) => Number(r.mes) === mes);
+      const gas = gastosPorMes.find((r) => Number(r.mes) === mes);
+      return {
+        mes,
+        ingresos: Number(ing?.total ?? 0),
+        gastos: Number(gas?.total ?? 0),
+      };
+    });
+  }  
 }

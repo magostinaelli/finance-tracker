@@ -12,7 +12,7 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Año</mat-label>
-      <mat-select [(ngModel)]="anio" (ngModelChange)="cargarResumen()">
+      <mat-select [(ngModel)]="anio" (ngModelChange)="cambiarAnio()">
         @for (a of anios; track a) {
           <mat-option [value]="a">{{ a }}</mat-option>
         }
@@ -27,7 +27,7 @@
       <mat-card-content>
         <mat-icon>trending_up</mat-icon>
         <div>
-          <p class="card-label">Ingresos</p>
+          <p class="card-label">Ingresos del mes</p>
           <p class="card-monto">{{ resumen.ingresos | currency:'ARS':'symbol':'1.0-0' }}</p>
         </div>
       </mat-card-content>
@@ -37,7 +37,7 @@
       <mat-card-content>
         <mat-icon>trending_down</mat-icon>
         <div>
-          <p class="card-label">Gastos</p>
+          <p class="card-label">Gastos del mes</p>
           <p class="card-monto">{{ resumen.gastos | currency:'ARS':'symbol':'1.0-0' }}</p>
         </div>
       </mat-card-content>
@@ -47,23 +47,49 @@
       <mat-card-content>
         <mat-icon>account_balance</mat-icon>
         <div>
-          <p class="card-label">Balance</p>
+          <p class="card-label">Balance del mes</p>
           <p class="card-monto">{{ resumen.balance | currency:'ARS':'symbol':'1.0-0' }}</p>
         </div>
       </mat-card-content>
     </mat-card>
   </div>
+}
 
+<mat-card class="grafico-card">
+  <mat-card-header>
+    <mat-card-title>Ingresos vs gastos por mes</mat-card-title>
+    <mat-card-subtitle>Año {{ anio }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="grafico-barras">
+      <canvas baseChart [data]="barData" [options]="barOptions" [type]="'bar'"></canvas>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+@if (resumen) {
   <div class="categorias">
     <mat-card class="tabla-categorias">
       <mat-card-header>
         <mat-card-title>Ingresos por categoría</mat-card-title>
+        <mat-card-subtitle>
+          {{ nombreMes }} {{ anio }} · Total {{ resumen.ingresos | currency:'ARS':'symbol':'1.0-0' }}
+        </mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
+        @if (resumen.categoriasIngresos.length > 0) {
+          <div class="grafico-pie">
+            <canvas baseChart [data]="pieIngresosData" [options]="pieOptions" [type]="'pie'"></canvas>
+          </div>
+        }
         @for (c of resumen.categoriasIngresos; track c.categoriaId) {
           <div class="categoria-row">
-            <span>{{ c.nombre }}</span>
-            <span>{{ c.total | currency:'ARS':'symbol':'1.0-0' }}</span>
+            <span class="categoria-nombre">
+              <span class="punto" [style.background]="getColor(c.categoriaId, 'ingreso')"></span>
+              {{ c.nombre }}
+            </span>
+            <span class="categoria-monto">{{ c.total | currency:'ARS':'symbol':'1.0-0' }}</span>
+            <span class="categoria-pct">{{ getPorcentaje(c.total, resumen.ingresos) }}</span>
           </div>
         } @empty {
           <div class="empty">Sin ingresos este mes</div>
@@ -71,16 +97,28 @@
       </mat-card-content>
     </mat-card>
 
-    
     <mat-card class="tabla-categorias">
       <mat-card-header>
         <mat-card-title>Gastos por categoría</mat-card-title>
+        <mat-card-subtitle>
+          {{ nombreMes }} {{ anio }} · Total {{ resumen.gastos | currency:'ARS':'symbol':'1.0-0' }}
+          · Incluye las cuotas de ese mes
+        </mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
+        @if (resumen.categoriasGastos.length > 0) {
+          <div class="grafico-pie">
+            <canvas baseChart [data]="pieGastosData" [options]="pieOptions" [type]="'pie'"></canvas>
+          </div>
+        }
         @for (c of resumen.categoriasGastos; track c.categoriaId) {
           <div class="categoria-row">
-            <span>{{ c.nombre }}</span>
-            <span>{{ c.total | currency:'ARS':'symbol':'1.0-0' }}</span>
+            <span class="categoria-nombre">
+              <span class="punto" [style.background]="getColor(c.categoriaId, 'gasto')"></span>
+              {{ c.nombre }}
+            </span>
+            <span class="categoria-monto">{{ c.total | currency:'ARS':'symbol':'1.0-0' }}</span>
+            <span class="categoria-pct">{{ getPorcentaje(c.total, resumen.gastos) }}</span>
           </div>
         } @empty {
           <div class="empty">Sin gastos este mes</div>
@@ -88,6 +126,8 @@
       </mat-card-content>
     </mat-card>
   </div>
+}
+
 @if (cuotasProximas.length > 0) {
   <mat-card class="cuotas-card">
     <mat-card-header>
@@ -109,6 +149,4 @@
       </a>
     </mat-card-content>
   </mat-card>
-}
-
 }
