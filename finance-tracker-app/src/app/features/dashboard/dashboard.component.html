@@ -1,7 +1,7 @@
 <div class="dashboard-header">
   <h1>Dashboard</h1>
   <div class="filtros">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Mes</mat-label>
       <mat-select [(ngModel)]="mes" (ngModelChange)="cargarResumen()">
         @for (m of meses; track m.valor) {
@@ -10,7 +10,7 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Año</mat-label>
       <mat-select [(ngModel)]="anio" (ngModelChange)="cambiarAnio()">
         @for (a of anios; track a) {
@@ -55,80 +55,19 @@
   </div>
 }
 
-<mat-card class="grafico-card">
-  <mat-card-header>
-    <mat-card-title>Ingresos vs gastos por mes</mat-card-title>
-    <mat-card-subtitle>Año {{ anio }}</mat-card-subtitle>
-  </mat-card-header>
-  <mat-card-content>
-    <div class="grafico-barras">
-      <canvas baseChart [data]="barData" [options]="barOptions" [type]="'bar'"></canvas>
-    </div>
-  </mat-card-content>
-</mat-card>
+<div class="fila-media">
+  <mat-card class="card-barras">
+    <mat-card-header>
+      <mat-card-title>Ingresos vs gastos por mes</mat-card-title>
+      <mat-card-subtitle>Año {{ anio }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="grafico-barras">
+        <canvas baseChart [data]="barData" [options]="barOptions" [type]="'bar'"></canvas>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
-@if (resumen) {
-  <div class="categorias">
-    <mat-card class="tabla-categorias">
-      <mat-card-header>
-        <mat-card-title>Ingresos por categoría</mat-card-title>
-        <mat-card-subtitle>
-          {{ nombreMes }} {{ anio }} · Total {{ resumen.ingresos | currency:'ARS':'symbol':'1.0-0' }}
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        @if (resumen.categoriasIngresos.length > 0) {
-          <div class="grafico-pie">
-            <canvas baseChart [data]="pieIngresosData" [options]="pieOptions" [type]="'pie'"></canvas>
-          </div>
-        }
-        @for (c of resumen.categoriasIngresos; track c.categoriaId) {
-          <div class="categoria-row">
-            <span class="categoria-nombre">
-              <span class="punto" [style.background]="getColor(c.categoriaId, 'ingreso')"></span>
-              {{ c.nombre }}
-            </span>
-            <span class="categoria-monto">{{ c.total | currency:'ARS':'symbol':'1.0-0' }}</span>
-            <span class="categoria-pct">{{ getPorcentaje(c.total, resumen.ingresos) }}</span>
-          </div>
-        } @empty {
-          <div class="empty">Sin ingresos este mes</div>
-        }
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="tabla-categorias">
-      <mat-card-header>
-        <mat-card-title>Gastos por categoría</mat-card-title>
-        <mat-card-subtitle>
-          {{ nombreMes }} {{ anio }} · Total {{ resumen.gastos | currency:'ARS':'symbol':'1.0-0' }}
-          · Incluye las cuotas de ese mes
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        @if (resumen.categoriasGastos.length > 0) {
-          <div class="grafico-pie">
-            <canvas baseChart [data]="pieGastosData" [options]="pieOptions" [type]="'pie'"></canvas>
-          </div>
-        }
-        @for (c of resumen.categoriasGastos; track c.categoriaId) {
-          <div class="categoria-row">
-            <span class="categoria-nombre">
-              <span class="punto" [style.background]="getColor(c.categoriaId, 'gasto')"></span>
-              {{ c.nombre }}
-            </span>
-            <span class="categoria-monto">{{ c.total | currency:'ARS':'symbol':'1.0-0' }}</span>
-            <span class="categoria-pct">{{ getPorcentaje(c.total, resumen.gastos) }}</span>
-          </div>
-        } @empty {
-          <div class="empty">Sin gastos este mes</div>
-        }
-      </mat-card-content>
-    </mat-card>
-  </div>
-}
-
-@if (cuotasProximas.length > 0) {
   <mat-card class="cuotas-card">
     <mat-card-header>
       <mat-card-title>Próximos vencimientos</mat-card-title>
@@ -137,16 +76,93 @@
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      @for (c of cuotasProximas; track c.id) {
-        <div class="cuota-row">
-          <span class="cuota-fecha">{{ c.fecha | date:'dd/MM/yyyy' }}</span>
-          <span class="cuota-desc">{{ c.descripcion }}</span>
-          <span class="cuota-monto">{{ c.monto | currency:'ARS':'symbol':'1.0-0' }}</span>
-        </div>
-      }
+      <div class="cuotas-lista">
+        @for (c of cuotasProximas; track c.id) {
+          <div class="cuota-row">
+            <span class="cuota-fecha">{{ c.fecha | date:'dd/MM/yyyy' }}</span>
+            <span class="cuota-desc">{{ c.descripcion }}</span>
+            <span class="cuota-monto">{{ c.monto | currency:'ARS':'symbol':'1.0-0' }}</span>
+          </div>
+        } @empty {
+          <div class="empty">No hay vencimientos próximos</div>
+        }
+      </div>
       <a mat-button color="primary" routerLink="/cuotas-pendientes">
         Ver todas →
       </a>
     </mat-card-content>
   </mat-card>
+</div>
+
+@if (resumen) {
+  <div class="fila-categorias">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Ingresos por categoría</mat-card-title>
+        <mat-card-subtitle>
+          {{ nombreMes }} {{ anio }} · Total {{ resumen.ingresos | currency:'ARS':'symbol':'1.0-0' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="categoria-cuerpo">
+          @if (resumen.categoriasIngresos.length > 0) {
+            <div class="grafico-pie">
+              <div class="grafico-pie-interior">
+                <canvas baseChart [data]="pieIngresosData" [options]="pieOptions" [type]="'pie'"></canvas>
+              </div>
+            </div>
+          }
+          <div class="lista-categorias">
+            @for (c of resumen.categoriasIngresos; track c.categoriaId) {
+              <div class="categoria-row">
+                <span class="categoria-nombre">
+                  <span class="punto" [style.background]="getColor(c.categoriaId, 'ingreso')"></span>
+                  {{ c.nombre }}
+                </span>
+                <span class="categoria-monto">{{ c.total | currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span class="categoria-pct">{{ getPorcentaje(c.total, resumen.ingresos) }}</span>
+              </div>
+            } @empty {
+              <div class="empty">Sin ingresos este mes</div>
+            }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Gastos por categoría</mat-card-title>
+        <mat-card-subtitle>
+          {{ nombreMes }} {{ anio }} · Total {{ resumen.gastos | currency:'ARS':'symbol':'1.0-0' }}
+          · Incluye las cuotas de ese mes
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="categoria-cuerpo">
+          @if (resumen.categoriasGastos.length > 0) {
+            <div class="grafico-pie">
+              <div class="grafico-pie-interior">
+                <canvas baseChart [data]="pieGastosData" [options]="pieOptions" [type]="'pie'"></canvas>
+              </div>
+            </div>
+          }
+          <div class="lista-categorias">
+            @for (c of resumen.categoriasGastos; track c.categoriaId) {
+              <div class="categoria-row">
+                <span class="categoria-nombre">
+                  <span class="punto" [style.background]="getColor(c.categoriaId, 'gasto')"></span>
+                  {{ c.nombre }}
+                </span>
+                <span class="categoria-monto">{{ c.total | currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span class="categoria-pct">{{ getPorcentaje(c.total, resumen.gastos) }}</span>
+              </div>
+            } @empty {
+              <div class="empty">Sin gastos este mes</div>
+            }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
 }

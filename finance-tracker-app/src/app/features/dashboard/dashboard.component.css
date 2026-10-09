@@ -1,14 +1,25 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 640px;
+}
+
+.dashboard-header,
+.cards-resumen {
+  flex: none;
+}
+
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
 }
 
 .dashboard-header h1 {
   margin: 0;
   font-size: 24px;
-  color: #333;
 }
 
 .filtros {
@@ -20,31 +31,30 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
-  margin-bottom: 24px;
 }
 
 .cards-resumen mat-card-content {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px !important;
+  padding: 12px 16px !important;
 }
 
 .cards-resumen mat-icon {
-  font-size: 40px;
-  width: 40px;
-  height: 40px;
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
 }
 
 .card-label {
   margin: 0;
   font-size: 14px;
-  color: #666;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .card-monto {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: bold;
 }
 
@@ -59,38 +69,86 @@
 .card-balance.negativo { border-left-color: #f44336; }
 .card-balance.negativo mat-icon { color: #f44336; }
 
-.grafico-card {
-  margin-bottom: 24px;
-}
-
-.grafico-barras {
-  position: relative;
-  height: 320px;
-  width: 100%;
-}
-
-.categorias {
+.fila-media {
+  flex: 1.4 1 0;
+  min-height: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: 16px;
 }
 
-.tabla-categorias mat-card-header {
-  margin-bottom: 12px;
+.fila-categorias {
+  flex: 1.2 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.fila-media mat-card,
+.fila-categorias mat-card {
+  min-height: 0;
+}
+
+.fila-media mat-card-header,
+.fila-categorias mat-card-header {
+  flex: none;
+  margin-bottom: 8px;
+}
+
+.fila-media mat-card-content,
+.fila-categorias mat-card-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-barras mat-card-content {
+  position: relative;
+}
+
+.grafico-barras {
+  position: absolute;
+  inset: 0 16px 12px 16px;
+}
+
+.categoria-cuerpo {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
 }
 
 .grafico-pie {
   position: relative;
-  height: 220px;
-  margin-bottom: 16px;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+.grafico-pie-interior {
+  position: absolute;
+  inset: 0;
+}
+
+.lista-categorias {
+  flex: 1 1 0;
+  min-width: 0;
+  align-self: center;
+  max-height: 100%;
+  overflow-y: auto;
 }
 
 .categoria-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
 }
 
 .categoria-nombre {
@@ -115,41 +173,49 @@
   min-width: 40px;
   text-align: right;
   font-size: 12px;
-  color: #999;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .empty {
-  color: #999;
+  color: var(--mat-sys-on-surface-variant);
   text-align: center;
   padding: 16px;
 }
 
 .cuotas-card {
-  margin-top: 16px;
   border-left: 4px solid #ff9800;
+}
+
+.cuotas-lista {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .cuota-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-  gap: 16px;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
 }
 
 .cuota-fecha {
-  color: #666;
-  font-size: 13px;
-  min-width: 90px;
+  min-width: 78px;
+  font-size: 12px;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .cuota-desc {
   flex: 1;
+  min-width: 0;
   font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cuota-monto {
   font-weight: bold;
-  color: #f44336;
+  color: var(--mat-sys-error);
 }
